@@ -1,8 +1,9 @@
+/*
 [].forEach.call(tree.querySelectorAll('ul li a'), function(el, i) {
     if (el.nextElementSibling)
         el.nextElementSibling.classList.add('hidden');
 });
-
+*/
 /* here we make a event delegation, we add an event handler to the hole tree */
 tree.addEventListener('click', function(e) {
     var el = e.target;
@@ -29,16 +30,24 @@ tree.addEventListener('click', function(e) {
 });
 
 class Menu {
+    maxid;
     constructor(menu) {
         this.menu = menu;
 
         this.menuDiv = document.getElementById('menu');
+        this.inputsDiv = document.getElementById('inputs');
         this.firstUl = document.createElement('ul');
+
+        this.inputName = document.getElementById('input-name');
+        this.inputsIdSelector = document.getElementById('input-id-selector');
+        this.inputInsertSelector = document.getElementById('input-insert-selector');
+        this.submitButton = document.getElementById('submit-button');
 
         this.printMenu(this.menu);
 
-        this.listeners();
         this.hiddenMenuElements();
+        this.listeners();
+        this.inputsIdSelectorFill();
     }
 
     // element builder
@@ -52,7 +61,7 @@ class Menu {
     }
 
     hiddenMenuElements = () => {
-        let allElement = this.menuDiv.querySelectorAll('a');
+        let allElement = this.menuDiv.querySelectorAll('div#menu a');
         allElement.forEach((element) => {
             if (element.nextElementSibling) {
                 element.nextElementSibling.classList.add('hidden');
@@ -72,14 +81,11 @@ class Menu {
     addNewRow = (element) => {
         console.log(element.id, element.name)
         let newLi = this.createElementBuilder('li', { id: element.id, class: 'list-unstyled' });
-        let newA = this.createElementBuilder('a');
+        let newA = this.createElementBuilder('a', { id: 'a_' + element.id, class: 'd-block text-decoration-none text-black m-1 p-1 bg-white rounded' });
         newA.innerHTML = element.name;
         newLi.appendChild(newA);
 
-        //create add new li input
-        //newLi.appendChild(this.createLi(element.id));
-
-
+        // recursive
         if (element.child) {
             console.log(element.child);
             let childUl = this.createElementBuilder('ul');
@@ -93,24 +99,31 @@ class Menu {
         return newLi;
     }
 
-    createLi = (id) => {
-        let div = this.createElementBuilder('div', { class: 'p-1 border border-primary', id: 'createli_' + id });
-        let input = this.createElementBuilder('input', { type: 'text', class: 'form-control form-control-sm d-inline w-75' });
-        let button = this.createElementBuilder('button', { 'onclick': 'menu.addNewLi(' + id + ');', class: 'btn btn-sm p-1 m-0 btn-primary' }, 'Add');
-        div.appendChild(input);
-        div.appendChild(button);
-        return div;
-    }
-
-    addNewLi = (id) => {
-        console.log('addNewLi ID: ' + id);
+    inputsIdSelectorFill = () => {
+        let num = 0;
+        this.inputsIdSelector.innerHTML = '';
+        let allId = this.menuDiv.querySelectorAll('div#menu li');
+        allId.forEach((element) => {
+            let newRow = this.createElementBuilder('option', { value: element.id }, element.id);
+            this.inputsIdSelector.appendChild(newRow);
+            num++;
+        });
+        this.maxid = num;
     }
 
     listeners = () => {
+
+        [].forEach.call(this.menuDiv.querySelectorAll('ul li a'), function(el) {
+            if (el.nextElementSibling)
+                el.nextElementSibling.classList.add('hidden');
+        });
+
         this.menuDiv.addEventListener('click', function(e) {
             var el = e.target;
             if (el.tagName === 'A') {
                 e.preventDefault();
+                console.log('Itt');
+                console.log(el);
                 if (el.nextElementSibling) {
                     el.nextElementSibling.classList.toggle('hidden');
                 } else {
@@ -120,6 +133,39 @@ class Menu {
                 }
             }
         });
+
+        this.submitButton.addEventListener('click', () => this.addNewMenuElement(this.inputName.value, this.inputsIdSelector.value, this.inputInsertSelector.value, this.createElementBuilder, this.inputsIdSelectorFill, this.maxid++), false);
+
+    }
+
+    addNewMenuElement = (inputName, inputsIdSelector, inputInsertSelector, createElementBuilder, inputsIdSelectorFill, newId) => {
+
+        console.log(inputName, inputsIdSelector, inputInsertSelector);
+
+        if (inputInsertSelector === 'row') {
+            let inserted = createElementBuilder('li', { id: newId, class: 'list-unstyled' });
+            let newA = createElementBuilder('a', { id: 'a_' + newId, class: 'd-block text-decoration-none text-black m-1 p-1 bg-danger rounded' }, inputName + newId);
+            inserted.appendChild(newA);
+            let child = document.querySelector(`#menu li[id="${inputsIdSelector}"]`);
+            let parent = child.parentNode;
+            parent.insertBefore(inserted, child);
+        }
+
+        if (inputInsertSelector === 'child') {
+            console.log(document.querySelector(`#menu a[id="a_${inputsIdSelector}"]`));
+
+            let inserted = createElementBuilder('ul');
+            let insLi = createElementBuilder('li', { id: newId, class: 'list-unstyled' });
+            let newA = createElementBuilder('a', { id: 'a_' + newId, class: 'd-block text-decoration-none text-white m-1 p-1 bg-black rounded' }, inputName + newId);
+            insLi.appendChild(newA);
+            inserted.appendChild(insLi);
+            //---
+            let referenceNode = document.querySelector(`#menu a[id="a_${inputsIdSelector}"]`);
+
+            referenceNode.parentNode.insertBefore(inserted, referenceNode.nextSibling);
+        }
+
+        inputsIdSelectorFill();
     }
 
 }
@@ -131,9 +177,18 @@ let menu = [{
                 id: 1,
                 name: '01',
                 child: [{
-                    id: 5,
-                    name: '05'
-                }]
+                        id: 5,
+                        name: '05'
+                    },
+                    {
+                        id: 6,
+                        name: '06'
+                    },
+                    {
+                        id: 7,
+                        name: '07'
+                    }
+                ]
             },
             {
                 id: 3,
@@ -146,5 +201,8 @@ let menu = [{
         name: '04'
     },
 ];
+
+
+//let menu = [{ id: 0, name: '000' }];
 
 menu = new Menu(menu);
