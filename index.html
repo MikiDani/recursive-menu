@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="icon" type="image/x-icon" href="/img/amoba.ico">
+    <script src="main.js" defer></script>
+    <title>Menu</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <hr>MENU test</h1>
+        <hr>
+        <div id="tree">
+            <ul>
+                <li>
+                    <a>Father</a>
+                    <ul>
+                        <li>
+                            <a>Son</a>
+                        </li>
+                        <li>
+                            <a>Son2</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a>Grandfather</a>
+                    <ul>
+                        <li>
+                            <a>Father</a>
+                            <ul>
+                                <li>
+                                    <a>Son</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a>Mutter</a>
+                            <ul>
+                                <li>
+                                    <a>Csaj</a>
+                                </li>
+                                <li>
+                                    <a>Nő</a>
+                                    <ul>
+                                        <li>
+                                            <a>1.</a>
+                                        </li>
+                                        <li>
+                                            <a>2.</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a>Father</a>
+                    <ul>
+                        <li>
+                            <a>Son</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </main>
+
+    <div class="row p-0 m-0 mt-5">
+        <div id="menu" class="col-6 bg-warning">
+        </div>
+        <div id="inputs" class="col-6 bg-success">
+        </div>
+    </div>
+</body>
+
+</html>
