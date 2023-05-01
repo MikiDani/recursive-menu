@@ -11,12 +11,12 @@ class Menu {
         this.inputName = document.getElementById('input-name')
         this.inputsIdSelector = document.getElementById('input-id-selector')
         this.inputInsertSelector = document.getElementById('input-insert-selector')
-        this.inputRename = document.getElementById('input-rename')
         this.submitButtonIns = document.getElementById('submit-button-ins')
         this.submitButtonDel = document.getElementById('submit-button-del')
         this.submitButtonRename = document.getElementById('submit-button-rename')
         this.submitButtonOpen = document.getElementById('submit-menu-open')
         this.submitButtonClose = document.getElementById('submit-menu-close')
+        this.submitButtonSave = document.getElementById('submit-button-save')
         this.msg = document.getElementById('msg')
 
         this.printMenu(this.menu)
@@ -24,6 +24,9 @@ class Menu {
         //this.menuElementsSwitch('add')
         this.listeners()
         this.inputsIdSelectorFill()
+
+        this.variableSave()
+
     }
 
     // element builder
@@ -34,6 +37,60 @@ class Menu {
         }
         newElement.innerHTML = (value) ? value : null
         return newElement
+    }
+
+    variableSave = () => {
+        console.log('VARIABLE SAVE:')
+        console.log('menuDiv:')
+        console.log(this.menuDiv)
+            /*
+            let findId = 4
+            var foundIndex = this.menu.findIndex(x => x.id === findId);
+            console.log(this.menu[foundIndex])
+            */
+        console.log('variable:')
+        console.log(this.menu)
+        console.log('--------------')
+
+        function recursiveLog(element) {
+
+            console.log(element)
+
+            if (element.tagName === 'A') {
+                console.log('Ez egy <a>')
+            }
+            if (element.tagName === 'UL') {
+                console.log('Ez egy <ul>')
+            }
+
+            if (element.tagName === 'LI') {
+                console.log('Ez egy <li>')
+            }
+
+            if (element.nextElementSibling) {
+                recursiveLog(element.nextElementSibling)
+            }
+            return;
+        }
+
+        let allElement = this.menuDiv.querySelectorAll('div#menu a')
+        allElement.forEach((element) => {
+            recursiveLog(element)
+        })
+
+
+        /*
+        if (element.nextElementSibling) {
+            console.log(element.nextElementSibling)
+        }
+        */
+    }
+
+
+    menuSave = (div, menu) => {
+
+        this.variableSave()
+
     }
 
     menuElementsSwitch = (mode) => {
@@ -91,21 +148,23 @@ class Menu {
 
         this.submitButtonDel.addEventListener('click', () => this.deleteMenuElement(this.inputsIdSelector.value, this.inputsIdSelectorFill), false)
 
-        this.submitButtonRename.addEventListener('click', () => this.renameMenuElement(this.inputsIdSelector.value, this.inputRename.value, ), false)
+        this.submitButtonRename.addEventListener('click', () => this.renameMenuElement(this.inputsIdSelector.value, this.inputName.value), false)
 
         this.submitButtonOpen.addEventListener('click', () => this.menuElementsSwitch('remove'), false)
 
         this.submitButtonClose.addEventListener('click', () => this.menuElementsSwitch('add'), false)
+
+        this.submitButtonSave.addEventListener('click', () => this.menuSave(this.menuDiv, this.menu), false)
     }
 
     renameMenuElement = (selectedId, newName) => {
-        console.log(selectedId)
         let actualElemet = document.querySelector(`[id="a_${selectedId}"]`)
         this.colorizeError(actualElemet)
-
         if (newName !== '') {
             console.log(newName)
             actualElemet.innerHTML = newName
+            this.inputsIdSelectorFill()
+            this.variableSave()
         } else {
             this.insertMessage('Üres az átnevezés mező!')
         }
@@ -118,8 +177,7 @@ class Menu {
         if (selectedElement.querySelector('ul') == null) {
             selectedElement.remove()
             inputsIdSelectorFill()
-            console.log('----')
-            console.log(this.menu)
+            this.variableSave()
         } else {
             this.colorizeError(selectedElement)
             this.insertMessage(selectedId + ' Nem törölhető amíg vannak gyermekei!')
@@ -148,6 +206,7 @@ class Menu {
             referenceNode.parentNode.querySelector('ul').appendChild(inserted)
         }
 
+        this.variableSave()
         this.insertMessage(newId + '. id-jű ' + inputInsertSelector + ' beillesztve! Neve: ' + inputName)
 
         inputsIdSelectorFill()
@@ -192,7 +251,7 @@ class Menu {
 
 }
 
-
+/*
 let menu = [{
         id: 0,
         name: '00',
@@ -228,7 +287,7 @@ let menu = [{
         name: '08'
     },
 ]
-
-//let menu = [{ id: 0, name: '001' }]
+*/
+let menu = [{ id: 1, name: 'Az első menüpont' }]
 
 classMenu = new Menu(menu)
