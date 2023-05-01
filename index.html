@@ -1,37 +1,69 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="bootstrap.min.css">
-    <link rel="icon" type="image/x-icon" href="/img/amoba.ico">
-    <script src="main.js" defer></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="icon" type="image/x-icon" href="/img/menu.ico">
+    <script src="/js/main.js" defer></script>
     <title>Menu</title>
     <style>
         .hidden {
             display: none;
         }
+        
+        .colorize {
+            background-color: aquamarine !important;
+        }
+        
+        a:hover {
+            cursor: pointer;
+        }
     </style>
 </head>
 
-<body>
+<body class="bg-secondary">
     <hr>
     <h4>MENU test</h4>
     <hr>
     <div class="row p-0 m-0 mt-5">
-        <div id="menu" class="col-6 bg-warning">
+        <div id="menu" class="col-6 bg-dark">
         </div>
-        <div id="inputs" class="col-6 bg-success">
-            <input id="input-name" type="text" value="új valami" placeholder="name">
-            <select id="input-insert-selector">
+        <div id="inputs" class="col-6 bg-light p-2">
+            <div class="row p-0 m-0">
+                <div class="row m-0 p-0 mb-2">
+                    <button id="submit-menu-open" class="col-6 btn btn-sm btn-success">Menu nyit</button>
+                    <button id="submit-menu-close" class="col-6 btn btn-sm btn-success">Menu zár</button>
+                </div>
+            </div>
+            <small>Elem kiválasztó</small>
+            <select id="input-id-selector" class="form-control form-control-sm my-2">
+            </select>
+            <div class="row p-0 m-0">
+                <div class="col-6">
+                    <small>Új név megadása</small>
+                    <input id="input-name" type="text" value="új valami" class="form-control form-control-sm my-2">
+                </div>
+                <div class="col-6">
+                    <small>Átnevesés</small>
+                    <input id="input-rename" type="text" class="form-control form-control-sm my-2">
+                </div>
+            </div>
+            <small>Elem típus</small>
+            <select id="input-insert-selector" class="dropdown-toggle form-control border border-danger form-control-sm bg-warning my-2">
                 <option value="row">ROW</option>
                 <option value="child">CHILD</option>
             </select>
-            <select id="input-id-selector">
-            </select>
-            <button id="submit-button" class="bgn btn-primary">Create</button>
+            <div class="row p-0 m-0">
+                <button id="submit-button-ins" class="col-4 btn btn-sm btn-primary">Létrehozás</button>
+                <button id="submit-button-del" class="col-4 btn btn-sm btn-danger">Törlés</button>
+                <button id="submit-button-rename" class="col-4 btn btn-sm btn-warning">Átnevezés</button>
+            </div>
+            <hr>
+            <div id="msg" class="bg-white text-danger m-2 p-2"></div>
+            <hr>
         </div>
     </div>
 </body>
