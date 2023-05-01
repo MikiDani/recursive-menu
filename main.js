@@ -1,171 +1,143 @@
-/*
-[].forEach.call(tree.querySelectorAll('ul li a'), function(el, i) {
-    if (el.nextElementSibling)
-        el.nextElementSibling.classList.add('hidden');
-});
-*/
-/* here we make a event delegation, we add an event handler to the hole tree */
-tree.addEventListener('click', function(e) {
-    var el = e.target;
-
-    /* ha a kattintott elem egy horgony, az azért van, mert csomópont/levél */
-    /* if the element clicked is an anchor, it's because it's a node/leaf */
-    if (el.tagName === 'A') {
-        // letiltja az alapértelmezett történést
-        //e.preventDefault();
-
-        /* ha van nextElementSibling, az azért van, mert gyerekei vannak, tehát csomópont */
-        /* if it has a nextElementSibling, it's because it has children, so it's a node */
-        if (el.nextElementSibling) {
-
-            /* átkapcsoljuk a gyermek láthatóságát */
-            /* we toggle the visibility of the child */
-            el.nextElementSibling.classList.toggle('hidden');
-        } else {
-            // csinálj valamit az utolsó gyermekkel (levél)
-            // do something with the final child (leaf)
-            console.log(el.textContent);
-        }
-    }
-});
-
 class Menu {
-    maxid;
+    maxid
     constructor(menu) {
-        this.menu = menu;
+        this.menu = menu
 
-        this.menuDiv = document.getElementById('menu');
-        this.inputsDiv = document.getElementById('inputs');
-        this.firstUl = document.createElement('ul');
+        this.menuDiv = document.getElementById('menu')
+        this.inputsDiv = document.getElementById('inputs')
+        this.firstUl = document.createElement('ul')
 
-        this.inputName = document.getElementById('input-name');
-        this.inputsIdSelector = document.getElementById('input-id-selector');
-        this.inputInsertSelector = document.getElementById('input-insert-selector');
-        this.submitButton = document.getElementById('submit-button');
+        this.inputName = document.getElementById('input-name')
+        this.inputsIdSelector = document.getElementById('input-id-selector')
+        this.inputInsertSelector = document.getElementById('input-insert-selector')
+        this.submitButton = document.getElementById('submit-button')
 
-        this.printMenu(this.menu);
+        this.printMenu(this.menu)
 
-        this.hiddenMenuElements();
-        this.listeners();
-        this.inputsIdSelectorFill();
+        this.hiddenMenuElements()
+        this.listeners()
+        this.inputsIdSelectorFill()
+        console.log('qwerwer')
+        this.menuDiv.querySelectorAll('ul li a').forEach((element) => {
+            console.log(element.nextElementSibling.innerHTML);
+            if (element.nextElementSibling) {
+                element.nextElementSibling.classList.add('hidden')
+            }
+        });
     }
 
     // element builder
     createElementBuilder = (tagname, attributes, value) => {
-        let newElement = document.createElement(tagname);
+        let newElement = document.createElement(tagname)
         for (let key in attributes) {
-            newElement.setAttribute(key, attributes[key]);
+            newElement.setAttribute(key, attributes[key])
         }
-        newElement.innerHTML = (value) ? value : null;
-        return newElement;
+        newElement.innerHTML = (value) ? value : null
+        return newElement
     }
 
     hiddenMenuElements = () => {
-        let allElement = this.menuDiv.querySelectorAll('div#menu a');
+        let allElement = this.menuDiv.querySelectorAll('div#menu a')
         allElement.forEach((element) => {
             if (element.nextElementSibling) {
-                element.nextElementSibling.classList.add('hidden');
+                element.nextElementSibling.classList.add('hidden')
             }
-        });
+        })
     }
 
     // start
     printMenu = () => {
         this.menu.forEach(element => {
-            console.log(element);
-            this.firstUl.appendChild(this.addNewRow(element));
-        });
+            this.firstUl.appendChild(this.recursive(element))
+        })
         this.menuDiv.appendChild(this.firstUl)
     }
 
-    addNewRow = (element) => {
-        console.log(element.id, element.name)
-        let newLi = this.createElementBuilder('li', { id: element.id, class: 'list-unstyled' });
-        let newA = this.createElementBuilder('a', { id: 'a_' + element.id, class: 'd-block text-decoration-none text-black m-1 p-1 bg-white rounded' });
-        newA.innerHTML = element.name;
-        newLi.appendChild(newA);
+    recursive = (element) => {
+        let newLi = this.createElementBuilder('li', { id: element.id, class: 'list-unstyled' })
+        let newA = this.createElementBuilder('a', { id: 'a_' + element.id, class: 'd-block text-decoration-none text-black m-1 p-1 bg-white rounded' })
+        newA.innerHTML = element.name
+        let newUl = this.createElementBuilder('ul')
+        newLi.appendChild(newA)
+        newLi.appendChild(newUl)
 
         // recursive
         if (element.child) {
-            console.log(element.child);
-            let childUl = this.createElementBuilder('ul');
+            let childUl = this.createElementBuilder('ul')
             element.child.forEach(element => {
-                console.log(element);
-                childUl.appendChild(this.addNewRow(element));
-            });
-            newLi.appendChild(childUl);
+                childUl.appendChild(this.recursive(element))
+            })
+            newLi.appendChild(childUl)
         }
-
-        return newLi;
+        return newLi
     }
 
     inputsIdSelectorFill = () => {
-        let num = 0;
-        this.inputsIdSelector.innerHTML = '';
-        let allId = this.menuDiv.querySelectorAll('div#menu li');
+        let num = 0
+        this.inputsIdSelector.innerHTML = ''
+        let allId = this.menuDiv.querySelectorAll('div#menu li')
         allId.forEach((element) => {
-            let newRow = this.createElementBuilder('option', { value: element.id }, element.id);
-            this.inputsIdSelector.appendChild(newRow);
-            num++;
-        });
-        this.maxid = num;
+
+            if (element.querySelector('a').nextElementSibling) {
+                if (element.querySelector('a').nextElementSibling.innerHTML === '') {
+                    element.querySelector('a').style.fontStyle = 'italic'
+                }
+            }
+
+            let name = element.querySelector('a').innerHTML
+            let newRow = this.createElementBuilder('option', { value: element.id }, name)
+            this.inputsIdSelector.appendChild(newRow)
+            num++
+        })
+        this.maxid = num
     }
 
     listeners = () => {
-
-        [].forEach.call(this.menuDiv.querySelectorAll('ul li a'), function(el) {
-            if (el.nextElementSibling)
-                el.nextElementSibling.classList.add('hidden');
-        });
-
         this.menuDiv.addEventListener('click', function(e) {
-            var el = e.target;
+            var el = e.target
             if (el.tagName === 'A') {
-                e.preventDefault();
-                console.log('Itt');
-                console.log(el);
+                e.preventDefault()
                 if (el.nextElementSibling) {
-                    el.nextElementSibling.classList.toggle('hidden');
+                    el.nextElementSibling.classList.toggle('hidden')
                 } else {
                     // last element
-                    console.log('LAST ELEMENT');
-                    console.log(el.textContent);
+                    console.log('LAST ELEMENT')
+                    console.log(el.textContent)
                 }
             }
-        });
+        })
 
-        this.submitButton.addEventListener('click', () => this.addNewMenuElement(this.inputName.value, this.inputsIdSelector.value, this.inputInsertSelector.value, this.createElementBuilder, this.inputsIdSelectorFill, this.maxid++), false);
-
+        this.submitButton.addEventListener('click', () => this.addNewMenuElement(this.inputName.value, this.inputsIdSelector.value, this.inputInsertSelector.value, this.createElementBuilder, this.inputsIdSelectorFill, this.maxid++), false)
     }
 
     addNewMenuElement = (inputName, inputsIdSelector, inputInsertSelector, createElementBuilder, inputsIdSelectorFill, newId) => {
 
-        console.log(inputName, inputsIdSelector, inputInsertSelector);
-
+        console.log(inputName, inputsIdSelector, inputInsertSelector)
+            //row
         if (inputInsertSelector === 'row') {
-            let inserted = createElementBuilder('li', { id: newId, class: 'list-unstyled' });
-            let newA = createElementBuilder('a', { id: 'a_' + newId, class: 'd-block text-decoration-none text-black m-1 p-1 bg-danger rounded' }, inputName + newId);
-            inserted.appendChild(newA);
-            let child = document.querySelector(`#menu li[id="${inputsIdSelector}"]`);
-            let parent = child.parentNode;
-            parent.insertBefore(inserted, child);
+            let inserted = createElementBuilder('li', { id: newId, class: 'list-unstyled' })
+            let newA = createElementBuilder('a', { id: 'a_' + newId, class: 'd-block text-decoration-none text-black m-1 p-1 bg-danger rounded' }, inputName + newId)
+            let newUl = createElementBuilder('ul')
+            inserted.appendChild(newA)
+            inserted.appendChild(newUl)
+            let child = document.querySelector(`#menu li[id="${inputsIdSelector}"]`)
+            let parent = child.parentNode
+            parent.insertBefore(inserted, child)
         }
-
+        //child
         if (inputInsertSelector === 'child') {
-            console.log(document.querySelector(`#menu a[id="a_${inputsIdSelector}"]`));
+            let inserted = createElementBuilder('li', { id: newId, class: 'list-unstyled' })
+            let newA = createElementBuilder('a', { id: 'a_' + newId, class: 'd-block text-decoration-none text-white m-1 p-1 bg-black rounded' }, inputName + newId)
+            let newUl = createElementBuilder('ul')
+            inserted.appendChild(newA)
+            inserted.appendChild(newUl)
+            let referenceNode = document.querySelector(`#menu a[id="a_${inputsIdSelector}"]`)
 
-            let inserted = createElementBuilder('ul');
-            let insLi = createElementBuilder('li', { id: newId, class: 'list-unstyled' });
-            let newA = createElementBuilder('a', { id: 'a_' + newId, class: 'd-block text-decoration-none text-white m-1 p-1 bg-black rounded' }, inputName + newId);
-            insLi.appendChild(newA);
-            inserted.appendChild(insLi);
-            //---
-            let referenceNode = document.querySelector(`#menu a[id="a_${inputsIdSelector}"]`);
-
-            referenceNode.parentNode.insertBefore(inserted, referenceNode.nextSibling);
+            referenceNode.parentNode.querySelector('ul').classList.remove('hidden')
+            referenceNode.parentNode.querySelector('ul').appendChild(inserted)
         }
 
-        inputsIdSelectorFill();
+        inputsIdSelectorFill()
     }
 
 }
@@ -200,9 +172,8 @@ let menu = [{
         id: 4,
         name: '04'
     },
-];
+]
 
+//menu = [{ id: 0, name: '001' }]
 
-//let menu = [{ id: 0, name: '000' }];
-
-menu = new Menu(menu);
+menu = new Menu(menu)
