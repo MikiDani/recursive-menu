@@ -3,6 +3,7 @@ class Menu {
     constructor(menu) {
         this.time = 2000
         this.menu = menu
+        this.menuInvariable = []
 
         this.menuDiv = document.getElementById('menu')
         this.inputsDiv = document.getElementById('inputs')
@@ -17,14 +18,13 @@ class Menu {
         this.submitButtonOpen = document.getElementById('submit-menu-open')
         this.submitButtonClose = document.getElementById('submit-menu-close')
         this.submitButtonSave = document.getElementById('submit-button-save')
+        this.submitButtonReload = document.getElementById('submit-button-reload')
         this.msg = document.getElementById('msg')
 
-        this.printMenu(this.menu)
-
+        this.printMenu()
         //this.menuElementsSwitch('add')
         this.listeners()
         this.inputsIdSelectorFill()
-
         this.variableSave()
 
     }
@@ -40,52 +40,44 @@ class Menu {
     }
 
     variableSave = () => {
-        console.log('VARIABLE SAVE:')
-        console.log('menuDiv:')
-        console.log(this.menuDiv)
-            /*
-            let findId = 4
-            var foundIndex = this.menu.findIndex(x => x.id === findId);
-            console.log(this.menu[foundIndex])
-            */
-        console.log('variable:')
-        console.log(this.menu)
-        console.log('--------------')
-
-        function recursiveLog(element) {
-
-            console.log(element)
-
-            if (element.tagName === 'A') {
-                console.log('Ez egy <a>')
-            }
-            if (element.tagName === 'UL') {
-                console.log('Ez egy <ul>')
-            }
-
-            if (element.tagName === 'LI') {
-                console.log('Ez egy <li>')
-            }
-
-            if (element.nextElementSibling) {
-                recursiveLog(element.nextElementSibling)
-            }
-            return;
+        
+        const variableRecursiveBulder = (ul_element) => {
+            console.log(ul_element.tagName)
+    
+            let legoMenu = []
+    
+            ul_element.querySelectorAll(':scope > li').forEach(li_element => {
+                console.log(li_element)
+                let menuIns = []
+                menuIns['id'] = li_element.getAttribute('id')
+                menuIns['name'] = li_element.querySelector(':scope > a').innerHTML
+                
+                if (li_element.querySelector(':scope > a').nextElementSibling) {
+                    if (li_element.querySelector(':scope > a').nextElementSibling.tagName === 'UL') {
+    
+                        console.log (li_element.querySelector(':scope > a').nextElementSibling.tagName)
+    
+                        menuIns['child'] = variableRecursiveBulder(li_element.querySelector(':scope > a').nextElementSibling)
+                    }
+                }
+    
+                legoMenu.push(menuIns)
+            });
+            return legoMenu;
         }
 
-        let allElement = this.menuDiv.querySelectorAll('div#menu a')
-        allElement.forEach((element) => {
-            recursiveLog(element)
-        })
+        let firstMenuELement = this.menuDiv.querySelector('div#menu ul')
+        this.menuInvariable = variableRecursiveBulder(firstMenuELement)
+        console.log('----- END ----')
+        console.log(this.menuInvariable)
 
-
+        
         /*
         if (element.nextElementSibling) {
             console.log(element.nextElementSibling)
         }
         */
     }
-
 
     menuSave = (div, menu) => {
 
@@ -107,26 +99,37 @@ class Menu {
         })
     }
 
-    // start
+    // ----------
     printMenu = () => {
+
+        const recursive = (element) => {
+            let inserted = this.menuElementStyle(element.id, element.name)
+            
+            // recursive
+            if (element.child) {
+                let childUl = this.createElementBuilder('ul')
+                element.child.forEach(element => {
+                    childUl.appendChild(recursive(element))
+                })
+                inserted.appendChild(childUl)
+            }
+            return inserted
+        }
+
         this.menu.forEach(element => {
-            this.firstUl.appendChild(this.recursive(element))
+            this.firstUl.appendChild(recursive(element))
         })
         this.menuDiv.appendChild(this.firstUl)
     }
-
-    recursive = (element) => {
-        let inserted = this.menuElementStyle(element.id, element.name)
-
-        // recursive
-        if (element.child) {
-            let childUl = this.createElementBuilder('ul')
-            element.child.forEach(element => {
-                childUl.appendChild(this.recursive(element))
-            })
-            inserted.appendChild(childUl)
-        }
-        return inserted
+    // ----------
+    
+    menuReload(newMenu) {
+        //this.menu = newMenu
+        this.menuDiv.innerHTML = ''
+        //this.printMenu()
+        //this.menuElementsSwitch('add')
+        //this.inputsIdSelectorFill()
+        //this.variableSave()
     }
 
     listeners = () => {
@@ -155,6 +158,7 @@ class Menu {
         this.submitButtonClose.addEventListener('click', () => this.menuElementsSwitch('add'), false)
 
         this.submitButtonSave.addEventListener('click', () => this.menuSave(this.menuDiv, this.menu), false)
+        this.submitButtonReload.addEventListener('click', () => this.menuReload(this.menuInvariable), false)
     }
 
     renameMenuElement = (selectedId, newName) => {
@@ -168,7 +172,6 @@ class Menu {
         } else {
             this.insertMessage('Üres az átnevezés mező!')
         }
-
     }
 
     deleteMenuElement(selectedId, inputsIdSelectorFill) {
@@ -230,7 +233,7 @@ class Menu {
             this.inputsIdSelector.appendChild(newRow)
             num++
         })
-        this.maxid = num
+        this.maxid = num + 1
         console.log('MAXID:' + this.maxid)
     }
 
@@ -251,7 +254,6 @@ class Menu {
 
 }
 
-/*
 let menu = [{
         id: 0,
         name: '00',
@@ -285,9 +287,40 @@ let menu = [{
     {
         id: 8,
         name: '08'
-    },
-]
-*/
-let menu = [{ id: 1, name: 'Az első menüpont' }]
+}]
 
-classMenu = new Menu(menu)
+let menu2 = [{
+    id: 0,
+    name: 'alma',
+    child: [{
+            id: 1,
+            name: 'barack',
+            child: [{
+                    id: 5,
+                    name: 'cserko'
+                },
+                {
+                    id: 6,
+                    name: 'banán'
+                },
+            ]
+        },
+        {
+            id: 3,
+            name: 'szőlő'
+        }
+    ],
+},
+{
+    id: 4,
+    name: 'meggy'
+},
+{
+    id: 8,
+    name: 'kiwi'
+},
+]
+
+let menu3 = [{ id: 1, name: 'Az első menüpont' }]
+
+classMenu = new Menu(menu2)
