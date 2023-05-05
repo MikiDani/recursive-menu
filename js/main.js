@@ -21,12 +21,17 @@ class Menu {
         this.submitButtonReload = document.getElementById('submit-button-reload')
         this.msg = document.getElementById('msg')
 
-        this.printMenu()
-        //this.menuElementsSwitch('add')
+        this.reloadMenu()
         this.listeners()
+    }
+
+    reloadMenu = () => {
+        this.menuDiv.innerHTML = ''
+        this.printMenu()
         this.inputsIdSelectorFill()
         this.variableSave()
-
+        
+        //this.menuElementsSwitch('add')
     }
 
     // element builder
@@ -41,22 +46,16 @@ class Menu {
 
     variableSave = () => {
         
-        const variableRecursiveBulder = (ul_element) => {
-            console.log(ul_element.tagName)
-    
+        const variableRecursiveBulder = (ul_element) => {   
             let legoMenu = []
-    
             ul_element.querySelectorAll(':scope > li').forEach(li_element => {
-                console.log(li_element)
+
                 let menuIns = []
                 menuIns['id'] = li_element.getAttribute('id')
                 menuIns['name'] = li_element.querySelector(':scope > a').innerHTML
-                
+
                 if (li_element.querySelector(':scope > a').nextElementSibling) {
                     if (li_element.querySelector(':scope > a').nextElementSibling.tagName === 'UL') {
-    
-                        console.log (li_element.querySelector(':scope > a').nextElementSibling.tagName)
-    
                         menuIns['child'] = variableRecursiveBulder(li_element.querySelector(':scope > a').nextElementSibling)
                     }
                 }
@@ -70,13 +69,6 @@ class Menu {
         this.menuInvariable = variableRecursiveBulder(firstMenuELement)
         console.log('----- END ----')
         console.log(this.menuInvariable)
-
-        
-        /*
-        if (element.nextElementSibling) {
-            console.log(element.nextElementSibling)
-        }
-        */
     }
 
     menuSave = (div, menu) => {
@@ -101,7 +93,6 @@ class Menu {
 
     // ----------
     printMenu = () => {
-
         const recursive = (element) => {
             let inserted = this.menuElementStyle(element.id, element.name)
             
@@ -116,6 +107,9 @@ class Menu {
             return inserted
         }
 
+        // start print menu
+        this.firstUl.innerHTML=''
+
         this.menu.forEach(element => {
             this.firstUl.appendChild(recursive(element))
         })
@@ -123,15 +117,6 @@ class Menu {
     }
     // ----------
     
-    menuReload(newMenu) {
-        //this.menu = newMenu
-        this.menuDiv.innerHTML = ''
-        //this.printMenu()
-        //this.menuElementsSwitch('add')
-        //this.inputsIdSelectorFill()
-        //this.variableSave()
-    }
-
     listeners = () => {
         this.menuDiv.addEventListener('click', function(e) {
             var el = e.target
@@ -158,7 +143,11 @@ class Menu {
         this.submitButtonClose.addEventListener('click', () => this.menuElementsSwitch('add'), false)
 
         this.submitButtonSave.addEventListener('click', () => this.menuSave(this.menuDiv, this.menu), false)
-        this.submitButtonReload.addEventListener('click', () => this.menuReload(this.menuInvariable), false)
+
+        this.submitButtonReload.addEventListener('click', () => {
+            this.menu = this.menuInvariable;
+            this.reloadMenu()
+        }, false)
     }
 
     renameMenuElement = (selectedId, newName) => {
@@ -234,7 +223,6 @@ class Menu {
             num++
         })
         this.maxid = num + 1
-        console.log('MAXID:' + this.maxid)
     }
 
     insertMessage(msg) {

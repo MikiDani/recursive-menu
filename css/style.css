@@ -1,0 +1,11 @@
+.hidden {
+    display: none;
+}
+
+.colorize {
+    background-color: aquamarine !important;
+}
+
+a:hover {
+    cursor: pointer;
+}
