@@ -23,6 +23,6 @@ a:hover {
 }
 
 .last-link {
-    color: red !important;
+    color: green !important;
     font-style: italic;
 }

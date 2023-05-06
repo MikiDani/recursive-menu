@@ -1,8 +1,12 @@
 class Menu {
     constructor(menu) {
         this.time = 2000
+        this.staticMenu = menu
+        this.staticMenuName = 'Fruits'
         this.menu = menu
+        this.menuId = 0
         this.menuInVariable = []
+        this.menuList =[]
 
         this.menuDiv = document.getElementById('menu')
         this.inputsDiv = document.getElementById('inputs')
@@ -18,6 +22,8 @@ class Menu {
         this.submitButtonClose = document.getElementById('submit-menu-close')
         this.submitButtonSave = document.getElementById('submit-button-save')
         this.submitButtonReload = document.getElementById('submit-button-reload')
+        this.menuSelector = document.getElementById('menu-selector')
+        this.menuName = document.getElementById('menu-name')
         this.msg = document.getElementById('msg')
 
         this.reloadMenu()
@@ -26,6 +32,7 @@ class Menu {
 
     reloadMenu = () => {
         this.menuDiv.innerHTML = ''
+        this.menuSelectorOptions()
         this.printMenu()
         this.elementSelectorOptions()
         this.variableSave()
@@ -77,7 +84,7 @@ class Menu {
         $.ajax({
             method: "GET",
             url: "save.php",
-            data: {data: JSON.stringify(this.menuInVariable), menuid: 1 },
+            data: {data: JSON.stringify(this.menuInVariable), menuid: 2 },
             success: function(data){
                 $("#msg").html(data);
                 console.log(data);
@@ -157,6 +164,32 @@ class Menu {
 
         this.inputsIdSelector.addEventListener('change', (e) => this.colorizeError(document.querySelector(`[id="${e.target.value}"] a`))
         , false)
+
+        this.menuSelector.addEventListener('change', (e) => {
+
+            //console.log(e.target.value)
+            var selectedId = e.target.value
+            console.log(selectedId)
+
+            if (selectedId === 0) {
+                this.menu = this.staticMenu
+                this.menuName.innerHTML = this.staticMenuName
+            } else {
+                for (const key in  this.menuList) {
+                    const value =  this.menuList[key];
+                    
+                    console.log(value.name)
+
+                    if (value.id == selectedId) {
+                        this.menu = JSON.parse(value.menu)
+                        this.menuName.innerHTML = value.name
+                    }        
+                }
+            }
+
+            this.reloadMenu()
+
+        }, false)
 
     }
 
@@ -252,7 +285,7 @@ class Menu {
         return element;
     }
 
-    printMenu = () => {
+    printMenu = (menuId) => {
         const recursive = (element) => {
             let inserted = this.menuElementStyle(element.id, element.name)
             // recursive
@@ -277,6 +310,38 @@ class Menu {
             this.firstUl.appendChild(recursive(element))
         })
         this.menuDiv.appendChild(this.firstUl)
+    }
+
+    menuSelectorOptions = async (result) => {
+
+        this.menuSelector.innerHTML = ''
+
+        //let newRow = this.createElementBuilder('option', { id: 0 }, 'id: 0 Static Menu')
+        let newRow = this.createElementBuilder('option', { id: 0 }, '0')
+        this.menuSelector.appendChild(newRow)
+
+        try {
+            result = await $.ajax({
+                method: "GET",
+                url: "select.php",
+                success: function(data){
+                    return JSON.parse(data);
+                },
+                error: function() {
+                    alert("Error: No respone AJAX!");
+                }
+            });
+        } catch (error) {
+            console.error(error);
+        }
+
+        this.menuList = JSON.parse(result);
+
+        for (const key in  this.menuList) {
+            const value =  this.menuList[key];
+            //this.menuSelector.appendChild(this.createElementBuilder('option', {id: value.id}, 'id: ' + value.id +' '+ value.name))
+            this.menuSelector.appendChild(this.createElementBuilder('option', {id: value.id}, value.id))
+        };
     }
 
     elementSelectorOptions = () => {
@@ -353,4 +418,4 @@ let menu1 = [{
 
 let menu2 = [{ id: 1, name: 'Clear menu' }]
 
-classMenu = new Menu(menu2)
+classMenu = new Menu(menu1)
