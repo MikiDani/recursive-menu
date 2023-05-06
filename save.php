@@ -1,8 +1,10 @@
 <?php
 
+require "connect.php";
+
 class ConnectDatabase {
     protected $connect;
-    protected $conn;
+    public $conn;
 
     function __construct($host, $user, $password, $database)
     {
@@ -20,27 +22,35 @@ class ConnectDatabase {
 
         try {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            echo "Connected successfully";
         } catch(PDOException $e) {
             echo "Connection failed: " . $e->getMessage();
         }
     }
 }
 
-define("HOST", "localhost");
-define("USER","root");
-define("PASSWORD","");
-define("DATABASE","recursivemenu");
+$pdo = new ConnectDatabase(constant("HOST"), constant("USER"), constant("PASSWORD"), constant("DATABASE"));
 
-$connect = new ConnectDatabase(constant("HOST"), constant("USER"), constant("PASSWORD"), constant("DATABASE"));
 
-if (isset($_POST["menu"]))
+if (isset($_GET['data']))
 {
-    echo "Létezik a Menu variable!!!";
-    $menu = $_POST["menu"];
-    print_r($_POST["menu"]);
-    print_r(get_defined_vars());
+    $menuJsonString = $_GET['data'];
+    $menuid = $_GET['menuid'];
+    //$menuJson = json_decode($_GET['data']); 
+    //print_r($menuJsonString); print_r($menuid);
 
+    $stmt = $pdo->conn->prepare("SELECT * FROM menutable WHERE id=? LIMIT 1");
+    $stmt->execute([$menuid]);
+    $row = $stmt->fetch();
+
+    if ($row) {
+        $stmt = $pdo->conn->prepare("UPDATE menutable SET menu=? WHERE id=?")->execute([$menuJsonString, $menuid]);
+        print "The update is successful!";
+    } else {
+        $stmt = $pdo->conn->prepare("INSERT INTO menutable (id, menu) VALUES (?, ?)");
+        $stmt->execute([$menuid, $menuJsonString]);
+        print "The inserted is successful!";
+    }
+    
 }
 
 ?>
