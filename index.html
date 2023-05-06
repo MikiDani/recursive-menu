@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,44 +7,44 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="icon" type="image/x-icon" href="/img/menu.ico">
     <link rel="stylesheet" href="css/style.css">
+    <script src="/js/jquery-3.6.4.min.js" defer></script>
     <script src="/js/main.js" defer></script>
     <title>RECURSIVE MENU - MikiDani</title>
 </head>
-
 <body class="bg-secondary">
     <div class="bg-white text-center py-1">
         <hr>
-        <h4>RECURSIVE MENU - MikiDani</h4>
+        <h4>RECURSIVE MENU CREATOR</h4>
         <hr>
     </div>
-    <div class="row p-0 m-0 mt-5">
-        <div id="menu" class="col-6 bg-dark">
+    <div class="row p-0 m-0">
+        <div id="menu" class="col-6 bg-dark p-3">
         </div>
         <div id="inputs" class="col-6 bg-light p-2">
             <div class="row p-0 m-0">
                 <div class="row m-0 p-0 mb-2">
-                    <button id="submit-menu-open" class="col-6 btn btn-sm btn-success">Menu nyit</button>
-                    <button id="submit-menu-close" class="col-6 btn btn-sm btn-success">Menu zár</button>
+                    <button id="submit-menu-open" class="col-6 btn btn-sm btn-success text-uppercase my-1">open Menu</button>
+                    <button id="submit-menu-close" class="col-6 btn btn-sm btn-success text-uppercase my-1">close menu</button>
                 </div>
             </div>
-            <small>Elem kiválasztó</small>
+            <small>Elem selector</small>
             <select id="input-id-selector" class="form-control form-control-sm my-2">
             </select>
             <div class="row p-0 m-0">
-                <small>Új név megadása</small>
-                <input id="input-name" type="text" value="új valami" class="form-control form-control-sm my-2">
+                <small>New name input</small>
+                <input id="input-name" type="text" value="something new" class="form-control form-control-sm my-2">
             </div>
-            <small>Elem típus</small>
+            <small>New element type</small>
             <select id="input-insert-selector" class="dropdown-toggle form-control border border-danger form-control-sm bg-warning my-2">
                 <option value="row">ROW</option>
                 <option value="child">CHILD</option>
             </select>
             <div class="row p-0 m-0">
-                <button id="submit-button-ins" class="col-4 btn btn-sm btn-primary">Létrehozás</button>
-                <button id="submit-button-del" class="col-4 btn btn-sm btn-danger">Törlés</button>
-                <button id="submit-button-rename" class="col-4 btn btn-sm btn-warning">Átnevezés</button>
-                <button id="submit-button-reload" class="col-12 btn btn-sm btn-success">Újratöltés</button>
-                <button id="submit-button-save" class="col-12 btn btn-sm btn-primary border border-warning">Adatbázisba Mentés</button>
+                <button id="submit-button-ins" class="col-4 btn btn-sm btn-primary text-uppercase my-1">create</button>
+                <button id="submit-button-del" class="col-4 btn btn-sm btn-danger text-uppercase my-1">delete</button>
+                <button id="submit-button-rename" class="col-4 btn btn-sm btn-warning text-uppercase my-1">rename</button>
+                <button id="submit-button-reload" class="col-12 btn btn-sm btn-success text-uppercase my-1">reload</button>
+                <button id="submit-button-save" class="col-12 btn btn-sm btn-primary border border-warning text-uppercase my-1">save database</button>
             </div>
             <hr>
             <div id="msg" class="bg-white text-danger m-2 p-2"></div>
@@ -53,5 +52,4 @@
         </div>
     </div>
 </body>
-
 </html>
