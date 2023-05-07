@@ -18,38 +18,45 @@
         <hr>
     </div>
     <div class="row p-0 m-0 mx-auto col-12 col-md-10 col-xl-8">
-        <div id="menu-name" class="text-center text-uppercase p-1 pt-2"><h4>wer</h4></div>
+        <div class="row mx-auto text-center col-12 col-md-10 col-xl-8">
+            <label for="input-menu-name" class="d-inline-block">Menu Name:</label>
+            <input type="text" id="input-menu-name" class="form-control d-inline-block mb-3">
+        </div>
         <div id="menu" class="col-6 bg-dark p-3">
         </div>
         <div id="inputs" class="col-6 bg-light p-2">
             <div class="row p-0 m-0">
-                <div class="row m-0 p-0 mb-2">
-                    <select id="menu-selector" class="form-control form-control-sm my-2"></select>
+                <div class="col-6 m-0 p-0 mb-2">
+                    <select id="menu-selector" class="form-control form-control-sm"></select>
+                </div>
+                <div class="col-6 m-0 p-0 mb-2">
+                    <button id="submit-button-new" class="col-12 btn btn-sm btn-warning text-uppercase">New Menu</button>
+                </div>
+                <div class="row col-12 m-0 p-0 mb-2">
+                    <button id="submit-button-save" class="col-6 btn btn-sm btn-primary text-uppercase my-1">Save Changes Database</button>
+                    <button id="submit-button-delete" class="col-6 btn btn-sm btn-danger text-uppercase my-1">Delete Menu</button>
                 </div>
             </div>
             <div class="row p-0 m-0">
                 <div class="row m-0 p-0 mb-2">
-                    <button id="submit-menu-open" class="col-6 btn btn-sm btn-success text-uppercase my-1">open Menu</button>
-                    <button id="submit-menu-close" class="col-6 btn btn-sm btn-success text-uppercase my-1">close menu</button>
+                    <button id="submit-menu-open" class="col-6 btn btn-sm btn-success text-uppercase my-1">Open Menu</button>
+                    <button id="submit-menu-close" class="col-6 btn btn-sm btn-success text-uppercase my-1">Close Menu</button>
                 </div>
             </div>
-            <small>Elem selector</small>
+            <small>Elem Selector</small>
             <select id="input-id-selector" class="form-control form-control-sm my-2"></select>
-            <div class="row p-0 m-0">
-                <small>New name input</small>
-                <input id="input-name" type="text" value="something new" class="form-control form-control-sm my-2">
-            </div>
-            <small>New element type</small>
+            <small>New Name Input</small>
+            <input id="input-element-name" type="text" value="something new" class="form-control form-control-sm my-2">
+            <small>New Element Type</small>
             <select id="input-insert-selector" class="dropdown-toggle form-control border border-danger form-control-sm bg-warning my-2">
                 <option value="row">ROW</option>
                 <option value="child">CHILD</option>
             </select>
             <div class="row p-0 m-0">
-                <button id="submit-button-ins" class="col-4 btn btn-sm btn-primary text-uppercase my-1">create</button>
-                <button id="submit-button-del" class="col-4 btn btn-sm btn-danger text-uppercase my-1">delete</button>
-                <button id="submit-button-rename" class="col-4 btn btn-sm btn-warning text-uppercase my-1">rename</button>
-                <button id="submit-button-reload" class="col-12 btn btn-sm btn-success text-uppercase my-1">reload</button>
-                <button id="submit-button-save" class="col-12 btn btn-sm btn-primary border border-warning text-uppercase my-1">save database</button>
+                <button id="submit-button-ins" class="col-4 btn btn-sm btn-primary text-uppercase my-1">Create</button>
+                <button id="submit-button-del" class="col-4 btn btn-sm btn-danger text-uppercase my-1">Delete</button>
+                <button id="submit-button-rename" class="col-4 btn btn-sm btn-warning text-uppercase my-1">Rename</button>
+                <button id="submit-button-reload" class="col-12 btn btn-sm btn-success text-uppercase my-1">Reload</button>
             </div>
             <hr>
             <div id="msg" class="bg-white text-danger m-2 p-2"></div>

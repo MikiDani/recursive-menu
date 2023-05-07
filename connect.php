@@ -6,7 +6,6 @@ define("PASSWORD","");
 define("DATABASE","recursivemenu");
 
 class ConnectDatabase {
-    public $connect;
     public $conn;
 
     function __construct($host, $user, $password, $database)

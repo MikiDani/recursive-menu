@@ -2,17 +2,20 @@ class Menu {
     constructor(menu) {
         this.time = 2000
         this.staticMenu = menu
-        this.staticMenuName = 'Fruits'
+        this.staticMenuName = 'Fruits - Static Menu'
+        this.menuId = null
+        this.menuName = this.staticMenuName
         this.menu = menu
-        this.menuId = 0
         this.menuInVariable = []
-        this.menuList =[]
+        this.menuList = []
+        this.loadMenuHeighestId
 
         this.menuDiv = document.getElementById('menu')
         this.inputsDiv = document.getElementById('inputs')
         this.firstUl = document.createElement('ul')
 
-        this.inputName = document.getElementById('input-name')
+        this.inputElementName = document.getElementById('input-element-name')
+        this.inputMenuName = document.getElementById('input-menu-name')
         this.inputsIdSelector = document.getElementById('input-id-selector')
         this.inputInsertSelector = document.getElementById('input-insert-selector')
         this.submitButtonIns = document.getElementById('submit-button-ins')
@@ -22,8 +25,9 @@ class Menu {
         this.submitButtonClose = document.getElementById('submit-menu-close')
         this.submitButtonSave = document.getElementById('submit-button-save')
         this.submitButtonReload = document.getElementById('submit-button-reload')
+        this.submitButtonNew = document.getElementById('submit-button-new')
+        this.submitButtonDelete = document.getElementById('submit-button-delete')
         this.menuSelector = document.getElementById('menu-selector')
-        this.menuName = document.getElementById('menu-name')
         this.msg = document.getElementById('msg')
 
         this.reloadMenu()
@@ -32,11 +36,15 @@ class Menu {
 
     reloadMenu = () => {
         this.menuDiv.innerHTML = ''
+        this.msg.innerHTML = ''
         this.menuSelectorOptions()
-        this.printMenu()
-        this.elementSelectorOptions()
-        this.variableSave()
-        this.menuElementsSwitch('open')
+
+        if (this.menuId != null) {
+            this.printMenu()
+            this.elementSelectorOptions()
+            this.menuElementsSwitch('open')
+            this.variableSave()
+        }
     }
 
     // element builder
@@ -50,49 +58,53 @@ class Menu {
     }
 
     variableSave = () => {
-        
-        const variableRecursiveBulder = (ul_element) => {   
-            let legoMenu = []
-            ul_element.querySelectorAll(':scope > li').forEach(li_element => {
+        if (this.menuId) {
+            const variableRecursiveBulder = (ul_element) => {   
+                let legoMenu = []
+                ul_element.querySelectorAll(':scope > li').forEach(li_element => {
 
-                let menuIns = {}
-                menuIns['id'] = parseInt(li_element.getAttribute('id'))
-                menuIns['name'] = li_element.querySelector(':scope > a').innerText
+                    let menuIns = {}
+                    menuIns['id'] = parseInt(li_element.getAttribute('id'))
+                    menuIns['name'] = li_element.querySelector(':scope > a').innerText
 
-                if (li_element.querySelector(':scope > a').nextElementSibling) {
-                    if (li_element.querySelector(':scope > a').nextElementSibling.tagName === 'UL') {
-                        menuIns['child'] = variableRecursiveBulder(li_element.querySelector(':scope > a').nextElementSibling)
+                    if (li_element.querySelector(':scope > a').nextElementSibling) {
+                        if (li_element.querySelector(':scope > a').nextElementSibling.tagName === 'UL') {
+                            menuIns['child'] = variableRecursiveBulder(li_element.querySelector(':scope > a').nextElementSibling)
+                        }
                     }
-                }
-    
-                legoMenu.push(menuIns)
-            });
-            return legoMenu;
-        }
+        
+                    legoMenu.push(menuIns)
+                });
+                return legoMenu;
+            }
 
-        let firstMenuELement = this.menuDiv.querySelector('div#menu ul')
-        this.menuInVariable = variableRecursiveBulder(firstMenuELement)
-        console.log('----- menu in variable ----')
-        console.log(this.menuInVariable)
+            let firstMenuELement = this.menuDiv.querySelector('div#menu ul')
+            this.menuInVariable = variableRecursiveBulder(firstMenuELement)
+            //console.log('----- menu in variable ----')
+            //console.log(this.menuInVariable)
+        }
     }
 
-    saveDatabase = () => {
-        this.variableSave()
+    saveDatabase = async ($mode) => {
+        if (this.menuId) {
+            this.variableSave()
+                    
+            $("#msg").html('AJAX start!')
                 
-        $("#msg").html('AJAX start!')
-            
-        $.ajax({
-            method: "GET",
-            url: "save.php",
-            data: {data: JSON.stringify(this.menuInVariable), menuid: 2 },
-            success: function(data){
-                $("#msg").html(data);
-                console.log(data);
-            },
-            error: function() {
-                alert("Error: No respone AJAX!");
-            }
-        });
+            await $.ajax({
+                method: "GET",
+                url: "save.php",
+                data: {data: JSON.stringify(this.menuInVariable), menuid: this.menuId, menuname: this.menuName, mode: $mode },
+                success: function(data){
+                    $("#msg").html(data)
+                },
+                error: function() {
+                    alert("Error: No respone AJAX!");
+                }
+            });
+
+            this.menuSelectorOptions()
+        }
     }
 
     menuElementsSwitch = (mode) => {
@@ -145,17 +157,43 @@ class Menu {
             }
         })
 
-        this.submitButtonIns.addEventListener('click', () => this.addNewMenuElement(this.inputName.value, this.inputsIdSelector.value, this.inputInsertSelector.value, this.createElementBuilder, this.elementSelectorOptions, this.maxid++), false)
+        this.submitButtonIns.addEventListener('click', () => this.addNewMenuElement(this.inputElementName.value, this.inputsIdSelector.value, this.inputInsertSelector.value, this.createElementBuilder, this.elementSelectorOptions, this.maxid++), false)
 
         this.submitButtonDel.addEventListener('click', () => this.deleteMenuElement(this.inputsIdSelector.value, this.elementSelectorOptions), false)
 
-        this.submitButtonRename.addEventListener('click', () => this.renameMenuElement(this.inputsIdSelector.value, this.inputName.value), false)
+        this.submitButtonRename.addEventListener('click', () => this.renameMenuElement(this.inputsIdSelector.value, this.inputElementName.value), false)
 
         this.submitButtonOpen.addEventListener('click', () => this.menuElementsSwitch('open'), false)
 
         this.submitButtonClose.addEventListener('click', () => this.menuElementsSwitch('close'), false)
+        
+        this.submitButtonSave.addEventListener('click', () => this.saveDatabase('insert'), false)
+        
+        this.submitButtonNew.addEventListener('click', () => {
+                        
+            this.menuId = this.loadMenuHeighestId + 1
+            this.menuName = 'New Menu ' + this.menuId + '.'
+            this.inputMenuName.value = this.menuName
+            this.menu = clearMenu
+            this.reloadMenu()
+        }, false)
 
-        this.submitButtonSave.addEventListener('click', () => this.saveDatabase(), false)
+        this.submitButtonDelete.addEventListener('click', async () => {
+            if (this.menuId) {
+                if (confirm('Are you sure you want to delete menu into the database?')) {
+
+                    await this.saveDatabase('delete')
+
+                    this.menuDiv.innerHTML = ''
+                    this.menuSelector.innerHTML = ''
+                    this.menuId = null
+                    this.menu = []
+                    this.menuName = null
+                    this.inputMenuName.value = this.menuName
+                    location.reload();
+                }
+            }
+        }, false)
         
         this.submitButtonReload.addEventListener('click', () => {
             this.menu = this.menuInVariable;
@@ -165,127 +203,131 @@ class Menu {
         this.inputsIdSelector.addEventListener('change', (e) => this.colorizeError(document.querySelector(`[id="${e.target.value}"] a`))
         , false)
 
-        this.menuSelector.addEventListener('change', (e) => {
+        this.menuSelector.addEventListener('change', () => {
 
-            //console.log(e.target.value)
-            var selectedId = e.target.value
-            console.log(selectedId)
-
-            if (selectedId === 0) {
+            let selectedId = this.menuSelector.options[this.menuSelector.selectedIndex].getAttribute('id')
+            
+            if (selectedId == 0) {
+                this.menuId = 0
                 this.menu = this.staticMenu
-                this.menuName.innerHTML = this.staticMenuName
+                this.menuName = this.staticMenuName
+                this.inputMenuName.value = this.staticMenuName
             } else {
                 for (const key in  this.menuList) {
+
                     const value =  this.menuList[key];
-                    
-                    console.log(value.name)
 
                     if (value.id == selectedId) {
                         this.menu = JSON.parse(value.menu)
-                        this.menuName.innerHTML = value.name
-                    }        
+                        this.menuId = value.id
+                        this.menuName = value.name
+                        this.inputMenuName.value = value.name
+                    }     
                 }
             }
-
             this.reloadMenu()
-
         }, false)
 
+        this.inputMenuName.addEventListener('keyup', () => { this.menuName = this.inputMenuName.value }, false)
     }
 
-    addNewMenuElement = (inputName, inputsIdSelector, inputInsertSelector, createElementBuilder, elementSelectorOptions, newId) => {
-        //row
-        if (inputInsertSelector === 'row') {
-            let inserted = this.menuElementStyle(newId, inputName)
-            inserted.querySelector('a').classList.add('last-link')
-            let child = document.querySelector(`#menu li[id="${inputsIdSelector}"]`)
-            let parent = child.parentNode
-            //parent.insertBefore(inserted, child)  Ha a sor elejére akarom beilleszteni
-            parent.appendChild(inserted)
-        }
-        //child
-        if (inputInsertSelector === 'child') {
-            let inserted = this.menuElementStyle(newId, inputName)
-            inserted.querySelector('a').classList.add('last-link')
-            let referenceNode = document.querySelector(`#menu a[id="a_${inputsIdSelector}"]`)
-            if (referenceNode.parentNode.querySelector('ul') == null) {
-                let noFindUl = createElementBuilder('ul')
-                referenceNode.parentNode.appendChild(noFindUl)
+    addNewMenuElement = (inputElementName, inputsIdSelector, inputInsertSelector, createElementBuilder, elementSelectorOptions, newId) => {
+        if (this.menuId) {
+            //row
+            if (inputInsertSelector === 'row') {
+                let inserted = this.menuElementStyle(newId, inputElementName)
+                inserted.querySelector('a').classList.add('last-link')
+                let child = document.querySelector(`#menu li[id="${inputsIdSelector}"]`)
+                let parent = child.parentNode
+                //parent.insertBefore(inserted, child)  Ha a sor elejére akarom beilleszteni
+                parent.appendChild(inserted)
             }
-            referenceNode.parentNode.querySelector('ul').appendChild(inserted)
-            // parent icon create
-            if (referenceNode.parentNode.querySelector('ul').className==='hidden') {
-                referenceNode.parentNode.querySelector('i').classList.remove('open')
-                referenceNode.parentNode.querySelector('i').classList.remove('close')
-                referenceNode.parentNode.querySelector('i').classList.add('open')
-            } else {
-                referenceNode.parentNode.querySelector('i').classList.remove('open')
-                referenceNode.parentNode.querySelector('i').classList.remove('close')
-                referenceNode.parentNode.querySelector('i').classList.add('close')
+            //child
+            if (inputInsertSelector === 'child') {
+                let inserted = this.menuElementStyle(newId, inputElementName)
+                inserted.querySelector('a').classList.add('last-link')
+                let referenceNode = document.querySelector(`#menu a[id="a_${inputsIdSelector}"]`)
+                if (referenceNode.parentNode.querySelector('ul') == null) {
+                    let noFindUl = createElementBuilder('ul')
+                    referenceNode.parentNode.appendChild(noFindUl)
+                }
+                referenceNode.parentNode.querySelector('ul').appendChild(inserted)
+                // parent icon create
+                if (referenceNode.parentNode.querySelector('ul').className==='hidden') {
+                    referenceNode.parentNode.querySelector('i').classList.remove('open')
+                    referenceNode.parentNode.querySelector('i').classList.remove('close')
+                    referenceNode.parentNode.querySelector('i').classList.add('open')
+                } else {
+                    referenceNode.parentNode.querySelector('i').classList.remove('open')
+                    referenceNode.parentNode.querySelector('i').classList.remove('close')
+                    referenceNode.parentNode.querySelector('i').classList.add('close')
+                }
+                referenceNode.parentNode.querySelector('a').classList.remove('last-link')
             }
-            referenceNode.parentNode.querySelector('a').classList.remove('last-link')
 
+            this.variableSave()
+            this.insertMessage(newId + '. id-jű ' + inputInsertSelector + ' beillesztve! Neve: ' + inputElementName)
+
+            elementSelectorOptions()
         }
-
-        this.variableSave()
-        this.insertMessage(newId + '. id-jű ' + inputInsertSelector + ' beillesztve! Neve: ' + inputName)
-
-        elementSelectorOptions()
     }
 
     renameMenuElement = (selectedId, newName) => {
-        let actualElemet = document.querySelector(`[id="a_${selectedId}"]`)
-        this.colorizeError(actualElemet)
-        if (newName !== '') {
-            console.log(newName)
-            actualElemet.innerHTML = newName
-            this.elementSelectorOptions()
-            this.variableSave()
-        } else {
-            this.insertMessage('Üres az átnevezés mező!')
+        if (this.menuId) {
+            let actualElemet = document.querySelector(`[id="a_${selectedId}"]`)
+            this.colorizeError(actualElemet)
+            if (newName !== '') {
+                actualElemet.innerHTML = newName
+                this.elementSelectorOptions()
+                this.variableSave()
+            } else {
+                this.insertMessage('Üres az átnevezés mező!')
+            }
         }
     }
 
     deleteMenuElement(selectedId, elementSelectorOptions) {
-        let selectedElement = document.querySelector(`[id="${selectedId}"]`)
-        let thisParentElement = selectedElement.parentElement;
-        if (selectedElement.querySelector('ul') == null || selectedElement.querySelector('ul').innerHTML=='') {
+        if (this.menuId) {
+            let selectedElement = document.querySelector(`[id="${selectedId}"]`)
+            let thisParentElement = selectedElement.parentElement;
+            if (selectedElement.querySelector('ul') == null || selectedElement.querySelector('ul').innerHTML=='') {
 
-            if (thisParentElement.parentElement.getAttribute('id') === 'menu' && !(selectedElement.previousElementSibling || selectedElement.nextElementSibling)) {
-                this.insertMessage('At least one menu item must remain!')
-                this.colorizeError(thisParentElement.querySelector('li a'))
-                return;
+                if (thisParentElement.parentElement.getAttribute('id') === 'menu' && !(selectedElement.previousElementSibling || selectedElement.nextElementSibling)) {
+                    this.insertMessage('At least one menu item must remain!')
+                    this.colorizeError(thisParentElement.querySelector('li a'))
+                    return;
+                }
+
+                selectedElement.remove()
+
+                if (thisParentElement.innerHTML == '') {
+                    thisParentElement.parentElement.querySelector('a').classList.add('last-link');
+                    thisParentElement.parentElement.querySelector('a i').setAttribute('class', '');
+                    thisParentElement.parentElement.querySelector('ul').remove()
+                }
+
+                elementSelectorOptions()
+
+                this.variableSave()
+
+            } else {
+                this.colorizeError(selectedElement)
+                
+                this.insertMessage(selectedId + '. id. It cannot be deleted while you have children!')
             }
-
-            selectedElement.remove()
-
-            if (thisParentElement.innerHTML == '') {
-                thisParentElement.parentElement.querySelector('a').classList.add('last-link');
-                thisParentElement.parentElement.querySelector('a i').setAttribute('class', '');
-                thisParentElement.parentElement.querySelector('ul').remove()
-            }
-
-            elementSelectorOptions()
-
-            this.variableSave()
-
-        } else {
-            this.colorizeError(selectedElement)
-            
-            this.insertMessage(selectedId + '. id. It cannot be deleted while you have children!')
         }
     }
 
-    menuElementStyle = (newId, inputName) => {
+    menuElementStyle = (newId, inputElementName) => {
         let element = this.createElementBuilder('li', { id: newId, class: 'list-unstyled' })
-        let newA = this.createElementBuilder('a', { id: 'a_' + newId, class: 'd-flex justify-content-between align-items-center w-75 text-decoration-none text-black m-1 p-1 bg-white border rounded' }, inputName)
+        let newA = this.createElementBuilder('a', { id: 'a_' + newId, class: 'd-flex justify-content-between align-items-center w-75 text-decoration-none text-black m-1 p-1 bg-white border rounded' }, inputElementName)
         let icon = this.createElementBuilder('i')
         if (!newA.querySelector('i')) { newA.appendChild(icon) }
         element.appendChild(newA)
         return element;
     }
 
-    printMenu = (menuId) => {
+    printMenu = () => {
         const recursive = (element) => {
             let inserted = this.menuElementStyle(element.id, element.name)
             // recursive
@@ -312,16 +354,20 @@ class Menu {
         this.menuDiv.appendChild(this.firstUl)
     }
 
-    menuSelectorOptions = async (result) => {
+    menuSelectorOptions = async () => {
+        let loadMenu = null
+        let loadMenuIdNums = []
+        let loadMenuHeighestId = 0
 
         this.menuSelector.innerHTML = ''
 
-        //let newRow = this.createElementBuilder('option', { id: 0 }, 'id: 0 Static Menu')
-        let newRow = this.createElementBuilder('option', { id: 0 }, '0')
+        let nullRow = this.createElementBuilder('option', {}, '- Select Menu -')
+        this.menuSelector.appendChild(nullRow)
+        let newRow = this.createElementBuilder('option', { id: 0 }, 'id: 0 Static Menu')
         this.menuSelector.appendChild(newRow)
 
         try {
-            result = await $.ajax({
+            loadMenu = await $.ajax({
                 method: "GET",
                 url: "select.php",
                 success: function(data){
@@ -331,17 +377,22 @@ class Menu {
                     alert("Error: No respone AJAX!");
                 }
             });
-        } catch (error) {
+    } catch (error) {
             console.error(error);
         }
 
-        this.menuList = JSON.parse(result);
-
+        this.menuList = JSON.parse(loadMenu);
+       
         for (const key in  this.menuList) {
             const value =  this.menuList[key];
-            //this.menuSelector.appendChild(this.createElementBuilder('option', {id: value.id}, 'id: ' + value.id +' '+ value.name))
-            this.menuSelector.appendChild(this.createElementBuilder('option', {id: value.id}, value.id))
+            loadMenuIdNums.push(value.id)
+            this.menuSelector.appendChild(this.createElementBuilder('option', {id: value.id}, 'id: ' + value.id +' '+ value.name))
         };
+
+        loadMenuIdNums.forEach(element => {
+            loadMenuHeighestId = (element > loadMenuHeighestId) ? element : loadMenuHeighestId;
+        });
+        this.loadMenuHeighestId = loadMenuHeighestId;
     }
 
     elementSelectorOptions = () => {
@@ -371,7 +422,7 @@ class Menu {
 
 }
 
-let menu1 = [{
+let staticMenu = [{
     id: 0,
     name: 'tangerine',
     child: [{
@@ -416,6 +467,6 @@ let menu1 = [{
 },
 ]
 
-let menu2 = [{ id: 1, name: 'Clear menu' }]
+const clearMenu = [{ id: 1, name: 'New menu' }]
 
-classMenu = new Menu(menu1)
+classMenu = new Menu(staticMenu)
