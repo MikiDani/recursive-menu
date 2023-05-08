@@ -1,5 +1,7 @@
 <?php
 
+// if you use a database, you can set the connection data here. Create a "menutable" database in phpMyAdmin.
+
 define("HOST", "localhost");
 define("USER","root");
 define("PASSWORD","");

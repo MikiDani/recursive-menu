@@ -1,5 +1,8 @@
 class Menu {
     constructor(menu) {
+
+        this.enableDatabase = true; // Here you can set whether you use it with a database or statically.
+
         this.time = 2000
         this.staticMenu = menu
         this.staticMenuName = 'Fruits - Static Menu'
@@ -53,7 +56,9 @@ class Menu {
         for (let key in attributes) {
             newElement.setAttribute(key, attributes[key])
         }
+
         newElement.innerHTML = (value) ? value : null
+
         return newElement
     }
 
@@ -80,13 +85,14 @@ class Menu {
 
             let firstMenuELement = this.menuDiv.querySelector('div#menu ul')
             this.menuInVariable = variableRecursiveBulder(firstMenuELement)
-            //console.log('----- menu in variable ----')
-            //console.log(this.menuInVariable)
+
+            console.log('---- menu in variable ----')
+            console.log(this.menuInVariable)
         }
     }
 
     saveDatabase = async ($mode) => {
-        if (this.menuId) {
+        if (this.menuId && this.enableDatabase) {
             this.variableSave()
                     
             $("#msg").html('AJAX start!')
@@ -122,6 +128,7 @@ class Menu {
                     if (element.querySelector('i'))
                         element.querySelector('i').classList.add('open')
                 }
+
                 if (mode == 'open') {
                     element.nextElementSibling.classList.remove('hidden')
                    
@@ -151,7 +158,7 @@ class Menu {
                         el.querySelector('i').classList.add('close')
                     }
                 } else {
-                    // last element                
+                    // last element              
                     document.getElementById('msg').innerHTML = 'clicked menu id: ' + el.parentElement.getAttribute("id")
                 }
             }
@@ -170,7 +177,6 @@ class Menu {
         this.submitButtonSave.addEventListener('click', () => this.saveDatabase('insert'), false)
         
         this.submitButtonNew.addEventListener('click', () => {
-                        
             this.menuId = this.loadMenuHeighestId + 1
             this.menuName = 'New Menu ' + this.menuId + '.'
             this.inputMenuName.value = this.menuName
@@ -200,11 +206,9 @@ class Menu {
             this.reloadMenu()
         }, false)
 
-        this.inputsIdSelector.addEventListener('change', (e) => this.colorizeError(document.querySelector(`[id="${e.target.value}"] a`))
-        , false)
+        this.inputsIdSelector.addEventListener('change', (e) => this.colorizeError(document.querySelector(`[id="${e.target.value}"] a`)), false)
 
         this.menuSelector.addEventListener('change', () => {
-
             let selectedId = this.menuSelector.options[this.menuSelector.selectedIndex].getAttribute('id')
             
             if (selectedId == 0) {
@@ -213,16 +217,19 @@ class Menu {
                 this.menuName = this.staticMenuName
                 this.inputMenuName.value = this.staticMenuName
             } else {
-                for (const key in  this.menuList) {
 
-                    const value =  this.menuList[key];
+                if (this.enableDatabase) {
+                    for (const key in  this.menuList) {
 
-                    if (value.id == selectedId) {
-                        this.menu = JSON.parse(value.menu)
-                        this.menuId = value.id
-                        this.menuName = value.name
-                        this.inputMenuName.value = value.name
-                    }     
+                        const value =  this.menuList[key];
+
+                        if (value.id == selectedId) {
+                            this.menu = JSON.parse(value.menu)
+                            this.menuId = value.id
+                            this.menuName = value.name
+                            this.inputMenuName.value = value.name
+                        }     
+                    }
                 }
             }
             this.reloadMenu()
@@ -232,7 +239,7 @@ class Menu {
     }
 
     addNewMenuElement = (inputElementName, inputsIdSelector, inputInsertSelector, createElementBuilder, elementSelectorOptions, newId) => {
-        if (this.menuId) {
+        if (this.menuId !== null) {
             //row
             if (inputInsertSelector === 'row') {
                 let inserted = this.menuElementStyle(newId, inputElementName)
@@ -273,7 +280,7 @@ class Menu {
     }
 
     renameMenuElement = (selectedId, newName) => {
-        if (this.menuId) {
+        if (this.menuId !== null) {
             let actualElemet = document.querySelector(`[id="a_${selectedId}"]`)
             this.colorizeError(actualElemet)
             if (newName !== '') {
@@ -287,7 +294,7 @@ class Menu {
     }
 
     deleteMenuElement(selectedId, elementSelectorOptions) {
-        if (this.menuId) {
+        if (this.menuId !== null) {
             let selectedElement = document.querySelector(`[id="${selectedId}"]`)
             let thisParentElement = selectedElement.parentElement;
             if (selectedElement.querySelector('ul') == null || selectedElement.querySelector('ul').innerHTML=='') {
@@ -351,6 +358,7 @@ class Menu {
         this.menu.forEach(element => {
             this.firstUl.appendChild(recursive(element))
         })
+        
         this.menuDiv.appendChild(this.firstUl)
     }
 
@@ -363,27 +371,29 @@ class Menu {
 
         let nullRow = this.createElementBuilder('option', {}, '- Select Menu -')
         this.menuSelector.appendChild(nullRow)
-        let newRow = this.createElementBuilder('option', { id: 0 }, 'id: 0 Static Menu')
+        let newRow = this.createElementBuilder('option', { id: 0 }, 'id: 0 Fruits - Static Menu')
         this.menuSelector.appendChild(newRow)
 
-        try {
-            loadMenu = await $.ajax({
-                method: "GET",
-                url: "select.php",
-                success: function(data){
-                    return JSON.parse(data);
-                },
-                error: function() {
-                    alert("Error: No respone AJAX!");
-                }
-            });
-    } catch (error) {
-            console.error(error);
+        if (this.enableDatabase) {
+            try {
+                loadMenu = await $.ajax({
+                    method: "GET",
+                    url: "select.php",
+                    success: function(data){
+                        return JSON.parse(data);
+                    },
+                    error: function() {
+                        alert("Error: No respone AJAX!");
+                    }
+                });
+            } catch (error) {
+                console.error(error);
+            }
+
+            this.menuList = JSON.parse(loadMenu);
         }
 
-        this.menuList = JSON.parse(loadMenu);
-       
-        for (const key in  this.menuList) {
+        for (const key in this.menuList) {
             const value =  this.menuList[key];
             loadMenuIdNums.push(value.id)
             this.menuSelector.appendChild(this.createElementBuilder('option', {id: value.id}, 'id: ' + value.id +' '+ value.name))
