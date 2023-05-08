@@ -6,4 +6,4 @@ This is a recursive menu builder. The menu is stored in a variable. This will co
 
 If you use a database, you can set the connection data in "connect.php". Create a "menutable" database in phpMyAdmin. If you are not interested in saving to the database, you are only interested in the method, then you can also use the code statically. All you have to do is set the "enableDatabase" variable to false at the top of main.js.
 
-CSS, Bootstrap, Vanilla Js, Jquery, PHP, MySQL
+CSS, Bootstrap, Vanilla JS, jQuery, PHP, MySQL
